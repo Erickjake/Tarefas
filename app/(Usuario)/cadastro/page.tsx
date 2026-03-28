@@ -2,8 +2,8 @@
 
 "use client"; // Esta é uma página interativa (tem botões e formulários)
 
+import { trpc } from "@/lib/trpc";
 import { useState } from "react";
-import { trpc } from "../../lib/trpc"; // Nosso tradutor!
 
 export default function CadastroPage() {
     // 1. Criamos os "estados" (memória temporária) para guardar o que o usuário digita
