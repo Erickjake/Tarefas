@@ -1,17 +1,15 @@
 // Local do arquivo: server/index.ts
 
 import { z } from "zod";
-import * as jwt from "jsonwebtoken";
 import { router, publicProcedure, protectedProcedure } from "./trpc";
-import { prisma } from "../lib/prisma"; // Nosso banco de dados!
+import { prisma } from "../lib/prisma";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { da } from "zod/v4/locales";
+// Repara que apagámos o jsonwebtoken e os cookies das importações!
 
-// Aqui criamos o roteador principal da nossa aplicação
 export const appRouter = router({
-    // Criamos uma função chamada "cadastrarUsuario"
+    // --- 1. CRIAR CONTA (Mantém-se público para qualquer um se registar) ---
     cadastrarUsuario: publicProcedure
-        // O Zod (z) valida se o frontend está mandando os dados certos ANTES de rodar o código
         .input(
             z.object({
                 name: z.string().optional(),
@@ -21,22 +19,17 @@ export const appRouter = router({
                     .min(3, "A senha deve ter no mínimo 3 caracteres"),
             }),
         )
-        // "mutation" é usado quando vamos ALTERAR ou INSERIR dados no banco
         .mutation(async ({ input }) => {
-            // 1. Verificamos se o usuário já existe
             const usuarioExistente = await prisma.user.findUnique({
                 where: { email: input.email },
             });
 
             if (usuarioExistente) {
-                // No tRPC, lançamos erros assim:
                 throw new Error("Este email já está em uso.");
             }
 
-            // 2. Criptografamos a senha
             const senhaCriptografada = await bcrypt.hash(input.password, 10);
 
-            // 3. Salvamos no banco
             const novoUsuario = await prisma.user.create({
                 data: {
                     name: input.name,
@@ -45,135 +38,134 @@ export const appRouter = router({
                 },
             });
 
-            // 4. Retornamos o sucesso
             return {
                 mensagem: "Usuário cadastrado com sucesso!",
                 usuarioId: novoUsuario.id,
             };
         }),
-    getMe: protectedProcedure.query(async ({ ctx }) => {
-        // 1. Usamos o ID que está no contexto (vindo do token)
-        // para buscar o usuário completo no Prisma
-        const usuarioCompleto = await prisma.user.findUnique({
-            where: { id: ctx.user.id },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                // image: true, // Se tiveres este campo no teu schema.prisma
-            },
-        });
+       atualizarPerfil: protectedProcedure
+        .input(
+            z.object({
+                // 1. Mudamos aqui de 'name' para 'nome' para combinar com o Frontend
+                name: z.string().optional(),
+                email: z.string().email("Digite um email válido").optional(),
+                password: z
+                    .string()
+                    .min(3, "A senha deve ter no mínimo 3 caracteres")
+                    .optional(),
+            }),
+        )
+        .mutation(async ({ input, ctx }) => {
+            const dadosAtualizacao: any = {};
 
-        return usuarioCompleto;
-    }),
-    // Futuramente, adicionaremos "criarTarefa" ou "listarTarefas" aqui!
-    // --- 2. NOVA FUNÇÃO: CRIAR TAREFA ---
-    // Não se esqueça da vírgula antes de começar a nova função!
+            // 2. Mapeamos o "input.name    " do frontend para o "name" do Prisma
+            if (input.name) dadosAtualizacao.name = input.name;
+
+            if (input.email) dadosAtualizacao.email = input.email;
+
+            if (input.password) {
+                const senhaCriptografada = await bcrypt.hash(input.password, 10);
+                dadosAtualizacao.password = senhaCriptografada;
+            }
+
+            await prisma.user.update({
+                where: { id: Number(ctx.user.id) },
+                data: dadosAtualizacao,
+            });
+
+            return { mensagem: "Dados do usuário atualizados com sucesso!" };
+        }),
+
+        deletarUser: protectedProcedure
+        .mutation(async ({ ctx }) => {
+            await prisma.user.delete({
+                where: { id: Number(ctx.user.id) },
+            });
+
+            return { mensagem: "Usuário deletado com sucesso!" };
+        }),
+    // --- 2. CRIAR TAREFA (Protegido: só logados) ---
     criarTarefa: protectedProcedure
-        // O Zod valida os dados da tarefa antes de salvar
         .input(
             z.object({
                 titulo: z
                     .string()
                     .min(1, "O título da tarefa não pode estar vazio"),
-                descricao: z.string().optional(), // opcional, pois a pessoa pode querer só um título
+                descricao: z.string().optional(),
+                // Adicionamos a validação da frequência aqui!
+                frequencia: z
+                    .enum(["DIARIA", "SEMANAL", "MENSAL"])
+                    .default("DIARIA"),
             }),
         )
-        // mutation = vamos alterar/inserir algo no banco de dados
         .mutation(async ({ input, ctx }) => {
-            // Chamamos o Prisma para criar a tarefa na tabela 'Tarefas'
-            const novaTarefa = await prisma.tarefas.create({
+            const novaTarefa = await prisma.tarefa.create({
                 data: {
                     titulo: input.titulo,
                     descricao: input.descricao,
-                    // O Prisma é inteligente: ao passarmos o userId, ele já cria o vínculo (relation)
-                    // com o Usuário correto automaticamente!
-                    userId: ctx.user.id,
+                    frequencia: input.frequencia, // Guardamos no banco
+                    userId: Number(ctx.user.id),
                 },
             });
 
-            // Retornamos a tarefa recém-criada para o frontend
-            return {
-                mensagem: "Tarefa adicionada com sucesso!",
-                tarefa: novaTarefa,
-            };
+            return { mensagem: "Tarefa adicionada!", tarefa: novaTarefa };
         }),
-
-    // --- NOVA FUNÇÃO: LISTAR TAREFAS ---
-    listarTarefas: publicProcedure
-        .input(
-            z.object({
-                userId: z.number(), // Precisamos saber de qual usuário queremos as tarefas
-            }),
-        )
-        // Usamos 'query' porque estamos apenas LENDO dados, não alterando
-        .query(async ({ input }) => {
-            // Pedimos ao Prisma para buscar várias tarefas (findMany)
-            const tarefas = await prisma.tarefas.findMany({
+    // --- 3. LISTAR TAREFAS (Protegido e Seguro) ---
+    listarTarefas: protectedProcedure // Mudámos de public para protected!
+        // Removemos o .input() porque não precisamos que o frontend nos diga quem é o usuário.
+        // O servidor já sabe quem é através do cookie de sessão (NextAuth).
+        .query(async ({ ctx }) => {
+            const tarefas = await prisma.tarefa.findMany({
                 where: {
-                    userId: input.userId, // Onde o dono da tarefa seja o nosso usuário
+                    userId: Number(ctx.user.id), // Busca apenas as tarefas deste utilizador
                 },
                 orderBy: {
-                    id: "desc", // Ordena da mais nova para a mais velha (descendente)
+                    id: "desc",
                 },
             });
 
             return tarefas;
         }),
-    login: publicProcedure
+    alternarStatusTarefa: protectedProcedure
         .input(
             z.object({
-                email: z.email("Digite um email válido"),
-                password: z
-                    .string()
-                    .min(3, "A senha deve ter no mínimo 3 caracteres"),
+                id: z.number(), // O ID da tarefa que queremos alterar
+                concluida: z.boolean(), // O novo status (verdadeiro ou falso)
             }),
         )
         .mutation(async ({ input, ctx }) => {
-            // 1. Verificamos se o usuário existe
-            const usuarioExistente = await prisma.user.findUnique({
-                where: { email: input.email },
+            // Atualizamos a tarefa, mas garantimos que ela pertence ao usuário logado!
+            const tarefaAtualizada = await prisma.tarefa.updateMany({
+                where: {
+                    id: input.id,
+                    userId: Number(ctx.user.id), // Segurança extra!
+                },
+                data: {
+                    concluida: input.concluida,
+                },
             });
 
-            if (!usuarioExistente) {
-                // No tRPC, lançamos erros assim:
-                throw new Error("Este email não foi cadastrado.");
-            }
-
-            // 2. Compara a senha do usuário com a senha digitada pelo usuário
-            const senhaCorreta = await bcrypt.compare(
-                input.password,
-                usuarioExistente.password,
-            );
-
-            if (!senhaCorreta) {
-                // No tRPC, lançamos erros assim:
-                throw new Error("A senha está incorreta.");
-            }
-            const token = jwt.sign(
-                { userId: usuarioExistente.id },
-                process.env.JWT_SECRET!,
-                { expiresIn: "1h" },
-            );
-
-            (await cookies()).set("auth-token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                path: "/",
-                maxAge: 60 * 60 * 24 * 7,
-            });
-
-            return { success: true, name: usuarioExistente.name };
+            return { sucesso: true, atualizados: tarefaAtualizada.count };
         }),
-    logout: publicProcedure.mutation(async () => {
-        const cookieStore = await cookies();
-        // Apagar o cookie é simples: basta dar um .delete() ou setar com maxAge: 0
-        cookieStore.delete("auth-token");
 
-        return { success: true };
-    }),
-    // 3. Retornamos o sucesso
+    // --- 5. APAGAR TAREFA ---
+    apagarTarefa: protectedProcedure
+        .input(
+            z.object({
+                id: z.number(),
+            }),
+        )
+        .mutation(async ({ input, ctx }) => {
+            // Apagamos a tarefa garantindo que é do dono correto
+            const tarefaApagada = await prisma.tarefa.deleteMany({
+                where: {
+                    id: input.id,
+                    userId: Number(ctx.user.id), // Segurança: só apaga se for do usuário logado!
+                },
+            });
+
+            return { sucesso: true, apagados: tarefaApagada.count };
+        }),
 });
 
-// Exportamos o TIPO do roteador. É isso que dá o "superpoder" ao Frontend saber o que existe no Backend!
 export type AppRouter = typeof appRouter;

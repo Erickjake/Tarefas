@@ -1,43 +1,39 @@
 // Local do arquivo: server/trpc.ts
 
-import { cookies } from "next/headers";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { Context } from "./context";
-import jwt from "jsonwebtoken";
+import { getServerSession } from "next-auth";
+// Importante: Ajusta este caminho para onde criaste o route.ts do NextAuth!
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// 1. Inicializamos o tRPC. Isso só deve ser feito UMA VEZ por projeto.
+// 1. Inicializamos o tRPC.
 const t = initTRPC.context<Context>().create();
 
-// 2. Exportamos o "router" (roteador) que vai agrupar nossas rotas
+// 2. Exportamos o "router"
 export const router = t.router;
 
-// 3. Exportamos a "publicProcedure" (procedimento público).
-// É com ela que vamos criar nossas funções que o frontend pode chamar.
+// 3. Exportamos a "publicProcedure"
 export const publicProcedure = t.procedure;
 
+// 4. Atualizamos o protectedProcedure para usar o NextAuth
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
-    const cookieStore = await cookies();
-    const token = await cookieStore.get("auth-token")?.value;
-    if (!token) {
+    // Pede ao NextAuth a sessão atual do utilizador (lê os cookies automaticamente)
+    const session = await getServerSession(authOptions);
+
+    // Se não houver sessão ou utilizador, bloqueia o acesso
+    if (!session || !session.user) {
         throw new TRPCError({
             code: "UNAUTHORIZED",
-            message: "Não autorizado",
+            message: "Não autorizado. Precisas de fazer login.",
         });
     }
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-            userId: number;
-        };
-        return next({
-            ctx: {
-                ...ctx,
-                user: { id: decoded.userId },
-            },
-        });
-    } catch (err) {
-        throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Não autorizado",
-        });
-    }
+
+    // Se passou, injeta os dados do utilizador no contexto do tRPC
+    return next({
+        ctx: {
+            ...ctx,
+            // Agora o teu frontend vai ter acesso ao id, email, nome, etc.
+            user: session.user,
+        },
+    });
 });

@@ -3,10 +3,20 @@
 # top-most EditorConfig file
 root = true
 
+# Regras para TODOS os ficheiros
 [*]
 indent_style = space
 indent_size = 4
-end_of_line = crlf
+end_of_line = lf
 charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# O Markdown (.md) precisa de espaços no final da linha para criar quebras de linha
+[*.md]
 trim_trailing_whitespace = false
-insert_final_newline = false
+
+# Ficheiros de configuração (opcional, mas boa prática manter com 2 espaços)
+[*.{json,yml,yaml}]
+indent_style = space
+indent_size = 2

@@ -47,7 +47,7 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
- * Model Tarefas
+ * Model Tarefa
  * 
  */
-export type Tarefas = Prisma.TarefasModel
+export type Tarefa = Prisma.TarefaModel

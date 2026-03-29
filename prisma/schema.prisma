@@ -21,5 +21,6 @@ model Tarefa {
     descricao String?
     concluida Boolean @default(false)
     userId    Int
-    user      User    @relation(fields: [userId], references: [id])
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    frequencia  String   @default("DIARIA")
 }

@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.5.0
- * Query Engine version: 280c870be64f457428992c43c1f6d557fab6e29e
+ * Prisma Client JS version: 7.6.0
+ * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.5.0",
-  engine: "280c870be64f457428992c43c1f6d557fab6e29e"
+  client: "7.6.0",
+  engine: "75cbdc1eb7150937890ad5465d861175c6624711"
 }
 
 /**
@@ -385,7 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  Tarefas: 'Tarefas'
+  Tarefa: 'Tarefa'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -401,7 +401,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tarefas"
+    modelProps: "user" | "tarefa"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -479,77 +479,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Tarefas: {
-      payload: Prisma.$TarefasPayload<ExtArgs>
-      fields: Prisma.TarefasFieldRefs
+    Tarefa: {
+      payload: Prisma.$TarefaPayload<ExtArgs>
+      fields: Prisma.TarefaFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.TarefasFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload> | null
+          args: Prisma.TarefaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.TarefasFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>
+          args: Prisma.TarefaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>
         }
         findFirst: {
-          args: Prisma.TarefasFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload> | null
+          args: Prisma.TarefaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.TarefasFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>
+          args: Prisma.TarefaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>
         }
         findMany: {
-          args: Prisma.TarefasFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>[]
+          args: Prisma.TarefaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>[]
         }
         create: {
-          args: Prisma.TarefasCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>
+          args: Prisma.TarefaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>
         }
         createMany: {
-          args: Prisma.TarefasCreateManyArgs<ExtArgs>
+          args: Prisma.TarefaCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.TarefasCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>[]
+          args: Prisma.TarefaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>[]
         }
         delete: {
-          args: Prisma.TarefasDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>
+          args: Prisma.TarefaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>
         }
         update: {
-          args: Prisma.TarefasUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>
+          args: Prisma.TarefaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>
         }
         deleteMany: {
-          args: Prisma.TarefasDeleteManyArgs<ExtArgs>
+          args: Prisma.TarefaDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.TarefasUpdateManyArgs<ExtArgs>
+          args: Prisma.TarefaUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.TarefasUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>[]
+          args: Prisma.TarefaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>[]
         }
         upsert: {
-          args: Prisma.TarefasUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefasPayload>
+          args: Prisma.TarefaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TarefaPayload>
         }
         aggregate: {
-          args: Prisma.TarefasAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateTarefas>
+          args: Prisma.TarefaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTarefa>
         }
         groupBy: {
-          args: Prisma.TarefasGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TarefasGroupByOutputType>[]
+          args: Prisma.TarefaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TarefaGroupByOutputType>[]
         }
         count: {
-          args: Prisma.TarefasCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.TarefasCountAggregateOutputType> | number
+          args: Prisma.TarefaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TarefaCountAggregateOutputType> | number
         }
       }
     }
@@ -599,15 +599,16 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const TarefasScalarFieldEnum = {
+export const TarefaScalarFieldEnum = {
   id: 'id',
   titulo: 'titulo',
   descricao: 'descricao',
   concluida: 'concluida',
-  userId: 'userId'
+  userId: 'userId',
+  frequencia: 'frequencia'
 } as const
 
-export type TarefasScalarFieldEnum = (typeof TarefasScalarFieldEnum)[keyof typeof TarefasScalarFieldEnum]
+export type TarefaScalarFieldEnum = (typeof TarefaScalarFieldEnum)[keyof typeof TarefaScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -755,7 +756,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
-  tarefas?: Prisma.TarefasOmit
+  tarefa?: Prisma.TarefaOmit
 }
 
 /* Types for Logging */

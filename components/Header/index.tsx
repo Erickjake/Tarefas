@@ -11,28 +11,20 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// --- NOVAS IMPORTAÇÕES ---
 import { useRouter } from "next/navigation";
-import { trpc } from "@/lib/trpc";
+// --- NOVA IMPORTAÇÃO DO NEXTAUTH ---
+import { useSession, signOut } from "next-auth/react";
 
 export default function Header() {
     const router = useRouter();
 
-    // Criamos a mutação de logout
-    const logoutMutation = trpc.logout.useMutation({
-        onSuccess: () => {
-            // Quando o servidor apagar o cookie, mandamos o usuário para o login
-            router.push("/login");
-            router.refresh(); // Limpa o cache das páginas
-        }
-    });
+    // O NextAuth gerencia tudo isto para nós agora!
+    const { data: session, status } = useSession();
 
-    // --- CASO: UTILIZADOR LOGADO ---
-    const { data: user, isLoading: isLoadingUser } = trpc.getMe.useQuery();
+    // Variáveis auxiliares para manter a tua lógica igual
+    const isLoadingUser = status === "loading";
+    const user = session?.user;
 
-    const handleLogout = () => {
-        logoutMutation.mutate();
-    };
     const getInitials = (name?: string | null) => {
         if (!name) return "U"; // "U" de Usuário
         return name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
@@ -49,11 +41,19 @@ export default function Header() {
                         Minhas<span className="text-blue-600">Tarefas</span>
                     </h1>
                 </div>
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => router.push("/")}
+                        className="text-sm font-medium text-slate-600 hover:text-slate-800 transition-colors border-b-2 border-transparent hover:border-blue-600 focus:border-blue-600"
+                    >
+                        Home
+                    </button>
+                </div>
 
                 {/* Perfil */}
                 <div className="flex items-center gap-4">
                     {isLoadingUser ? (
-                        // Skeleton ou Texto de carregamento suave
+                        // Skeleton de carregamento suave
                         <span className="text-sm font-medium text-slate-400 animate-pulse">
                             A verificar...
                         </span>
@@ -67,10 +67,10 @@ export default function Header() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="outline-none">
                                     <Avatar className="cursor-pointer hover:ring-2 hover:ring-blue-600 hover:ring-offset-2 transition-all">
-                                        <AvatarImage src={user?.image || ""} alt={user?.name || "avatar"} />
+                                        {/* NextAuth usa user.image para a foto */}
+                                        <AvatarImage src={user.image || ""} alt={user.name || "avatar"} />
                                         <AvatarFallback className="bg-blue-100 text-blue-600 font-bold">
-                                            {getInitials(user?.name)}
-
+                                            {getInitials(user.name)}
                                         </AvatarFallback>
                                     </Avatar>
                                 </DropdownMenuTrigger>
@@ -85,20 +85,19 @@ export default function Header() {
                                         <User className="w-4 h-4" />
                                         <span>Meu Perfil</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer gap-2">
+                                    <DropdownMenuItem className="cursor-pointer gap-2" onClick={() => router.push("/settings")}>
                                         <Settings className="w-4 h-4" />
                                         <span>Configurações</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
+
+                                    {/* --- LOGOUT ATUALIZADO --- */}
                                     <DropdownMenuItem
-                                        onClick={handleLogout}
+                                        onClick={() => signOut({ callbackUrl: '/login' })}
                                         className="cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
-                                        disabled={logoutMutation.isPending}
                                     >
                                         <LogOut className="w-4 h-4" />
-                                        <span className="text-sm font-medium">
-                                            {logoutMutation.isPending ? "Saindo..." : "Sair da conta"}
-                                        </span>
+                                        <span className="text-sm font-medium">Sair da conta</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

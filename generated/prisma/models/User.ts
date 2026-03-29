@@ -185,7 +185,7 @@ export type UserGroupByOutputType = {
   _max: UserMaxAggregateOutputType | null
 }
 
-type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
+export type GetUserGroupByPayload<T extends UserGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<UserGroupByOutputType, T['by']> &
       {
@@ -208,7 +208,7 @@ export type UserWhereInput = {
   email?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringFilter<"User"> | string
-  Tarefas?: Prisma.TarefasListRelationFilter
+  Tarefas?: Prisma.TarefaListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -216,7 +216,7 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrder
-  Tarefas?: Prisma.TarefasOrderByRelationAggregateInput
+  Tarefas?: Prisma.TarefaOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -227,7 +227,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringFilter<"User"> | string
-  Tarefas?: Prisma.TarefasListRelationFilter
+  Tarefas?: Prisma.TarefaListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -256,7 +256,7 @@ export type UserCreateInput = {
   email: string
   name?: string | null
   password: string
-  Tarefas?: Prisma.TarefasCreateNestedManyWithoutUserInput
+  Tarefas?: Prisma.TarefaCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -264,14 +264,14 @@ export type UserUncheckedCreateInput = {
   email: string
   name?: string | null
   password: string
-  Tarefas?: Prisma.TarefasUncheckedCreateNestedManyWithoutUserInput
+  Tarefas?: Prisma.TarefaUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
-  Tarefas?: Prisma.TarefasUpdateManyWithoutUserNestedInput
+  Tarefas?: Prisma.TarefaUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -279,7 +279,7 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.StringFieldUpdateOperationsInput | string
-  Tarefas?: Prisma.TarefasUncheckedUpdateManyWithoutUserNestedInput
+  Tarefas?: Prisma.TarefaUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -435,7 +435,7 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  * UserCountOutputType without action
  */
 export type UserCountOutputTypeCountTarefasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.TarefasWhereInput
+  where?: Prisma.TarefaWhereInput
 }
 
 
@@ -480,7 +480,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    Tarefas: Prisma.$TarefasPayload<ExtArgs>[]
+    Tarefas: Prisma.$TarefaPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -881,7 +881,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  Tarefas<T extends Prisma.User$TarefasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$TarefasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TarefasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  Tarefas<T extends Prisma.User$TarefasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$TarefasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TarefaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1310,23 +1310,23 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
  */
 export type User$TarefasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Tarefas
+   * Select specific fields to fetch from the Tarefa
    */
-  select?: Prisma.TarefasSelect<ExtArgs> | null
+  select?: Prisma.TarefaSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Tarefas
+   * Omit specific fields from the Tarefa
    */
-  omit?: Prisma.TarefasOmit<ExtArgs> | null
+  omit?: Prisma.TarefaOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.TarefasInclude<ExtArgs> | null
-  where?: Prisma.TarefasWhereInput
-  orderBy?: Prisma.TarefasOrderByWithRelationInput | Prisma.TarefasOrderByWithRelationInput[]
-  cursor?: Prisma.TarefasWhereUniqueInput
+  include?: Prisma.TarefaInclude<ExtArgs> | null
+  where?: Prisma.TarefaWhereInput
+  orderBy?: Prisma.TarefaOrderByWithRelationInput | Prisma.TarefaOrderByWithRelationInput[]
+  cursor?: Prisma.TarefaWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.TarefasScalarFieldEnum | Prisma.TarefasScalarFieldEnum[]
+  distinct?: Prisma.TarefaScalarFieldEnum | Prisma.TarefaScalarFieldEnum[]
 }
 
 /**

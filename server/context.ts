@@ -1,34 +1,35 @@
 import { prisma } from "../lib/prisma";
-import { cookies } from "next/headers";
-import * as jwt from "jsonwebtoken";
+import { getServerSession } from "next-auth";
+// Ajusta o caminho para onde guardaste as tuas configurações do NextAuth
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export const createContext = async () => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
+    // 1. O NextAuth lê os cookies e valida a sessão automaticamente!
+    const session = await getServerSession(authOptions);
 
     let user = null;
 
-    if (token) {
+    // 2. Se houver uma sessão válida e um email
+    if (session?.user?.email) {
         try {
-            // Verificamos o token (usa a mesma SECRET que usaste no login)
-            const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-                userId: number;
-            };
-
-            // Aqui está o segredo: já buscamos o usuário completo no banco aqui!
+            // 3. Vamos buscar os dados frescos à base de dados com o Prisma
             user = await prisma.user.findUnique({
-                where: { id: decoded.userId },
+                where: { email: session.user.email },
                 select: { id: true, name: true, email: true },
             });
         } catch (error) {
-            // Token inválido ou expirado
+            console.error(
+                "Erro ao procurar o utilizador na base de dados",
+                error,
+            );
             user = null;
         }
     }
 
     return {
         prisma,
-        user, // Agora o 'user' com nome e imagem está no contexto!
+        user, // O utilizador validado da base de dados!
+        session, // Opcional: injetamos também a sessão crua caso precises no futuro
     };
 };
 
