@@ -454,6 +454,7 @@ export type TarefaCreateOrConnectWithoutUserInput = {
 
 export type TarefaCreateManyUserInputEnvelope = {
   data: Prisma.TarefaCreateManyUserInput | Prisma.TarefaCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type TarefaUpsertWithWhereUniqueWithoutUserInput = {
@@ -1243,6 +1244,7 @@ export type TarefaCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data used to create many Tarefas.
    */
   data: Prisma.TarefaCreateManyInput | Prisma.TarefaCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1261,6 +1263,7 @@ export type TarefaCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensio
    * The data used to create many Tarefas.
    */
   data: Prisma.TarefaCreateManyInput | Prisma.TarefaCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

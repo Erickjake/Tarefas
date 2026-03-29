@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@prisma/adapter-better-sqlite3": "^7.5.0",
-        "@prisma/adapter-pg": "^7.5.0",
+        "@prisma/adapter-pg": "^7.6.0",
         "@prisma/client": "^7.6.0",
         "@tanstack/react-query": "^5.95.2",
         "@trpc/client": "^11.15.0",
